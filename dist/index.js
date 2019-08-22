@@ -98,9 +98,7 @@ var GoogleRecaptcha = function (_React$Component) {
         loaded();
       } else {
         renderers.push(loaded);
-        if (!document.querySelector('#recaptcha')) {
-          injectScript(locale);
-        }
+        injectScript(locale);
       }
     }
   }, {
