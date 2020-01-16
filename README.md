@@ -69,6 +69,21 @@ import Recaptcha from 'react-google-invisible-recaptcha';
   onResolved={ () => console.log( 'Human detected.' ) } />
 ```
 
+### Using reCAPTCHA v3 ###
+To use v3 alongside v2, add a `sitekeyV3` and optionally supply an `action` (see [reCAPTCHA docs](https://developers.google.com/recaptcha/docs/v3#actions)).
+
+```js
+import Recaptcha from 'react-google-invisible-recaptcha';
+
+<Recaptcha
+  ref={ ref => this.recaptcha = ref }
+  sitekey={ <sitekey> }
+  sitekeyV3={ <sitekeyV3> }
+  onResolved={ () => console.log( 'Human detected.' ) } />
+```
+
+Then use `.executeV3` to call `grecaptcha.execute` with the v3 key.  Pass in a callback function to send the token to your backend (see [docs](https://developers.google.com/recaptcha/docs/v3#frontend_integration) for v3 front end integration).
+
 ## Configuration ##
 
 Set required props to get going.
@@ -92,6 +107,7 @@ A few optional props you can tweak.
 * _this.recaptcha.execute_ function which invokes the reCAPTCHA check.
 * _this.recaptcha.reset_ function which resets the reCAPTCHA widget.
 * _this.recaptcha.getResponse_ function which returns the response token.
+* _this.recaptcha.executeV3_ function which invokes the v3 the reCAPTCHA check. Takes a callback function.
 
 ## License ##
 
