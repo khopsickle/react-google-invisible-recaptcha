@@ -4,7 +4,7 @@ import uuid from 'uuid/v4';
 
 const renderers = [];
 
-const injectScript = locale => {
+const injectScript = (locale, sitekeyV3) => {
   window.GoogleRecaptchaLoaded = () => {
     while ( renderers.length ) {
       const renderer = renderers.shift();
@@ -12,9 +12,10 @@ const injectScript = locale => {
     }
   };
 
+  const srcRenderValue = sitekeyV3 || 'explicit';
   const script = document.createElement( 'script' );
   script.id = 'recaptcha';
-  script.src = `https://www.google.com/recaptcha/api.js?hl=${locale}&onload=GoogleRecaptchaLoaded&render=explicit`;
+  script.src = `https://www.google.com/recaptcha/api.js?hl=${locale}&onload=GoogleRecaptchaLoaded&render=${srcRenderValue}`;
   script.type = 'text/javascript';
   script.async = true;
   script.defer = true;
@@ -24,7 +25,7 @@ const injectScript = locale => {
 
 class GoogleRecaptcha extends React.Component {
   componentDidMount() {
-    const { sitekey, locale, badge, onResolved, onLoaded } = this.props;
+    const { sitekey, locale, badge, onResolved, onLoaded, sitekeyV3, action } = this.props;
 
     this.callbackName = 'GoogleRecaptchaResolved-' + uuid();
     window[ this.callbackName ] = onResolved;
@@ -40,6 +41,9 @@ class GoogleRecaptcha extends React.Component {
         this.execute = () => window.grecaptcha.execute( recaptchaId );
         this.reset = () => window.grecaptcha.reset( recaptchaId );
         this.getResponse = () => window.grecaptcha.getResponse( recaptchaId );
+        if (sitekeyV3) {
+          this.executeV3 = cb => window.grecaptcha.execute( sitekeyV3, { action } ).then(token => cb(token));
+        }
         onLoaded();
       }
     };
@@ -53,7 +57,7 @@ class GoogleRecaptcha extends React.Component {
       loaded();
     } else {
       renderers.push( loaded );
-      injectScript( locale );
+      injectScript( locale, sitekeyV3 );
     }
   }
   componentWillUnmount() {
@@ -70,6 +74,8 @@ class GoogleRecaptcha extends React.Component {
 
 GoogleRecaptcha.propTypes = {
   sitekey: PropTypes.string.isRequired,
+  sitekeyV3: PropTypes.string,
+  action: PropTypes.string,
   locale: PropTypes.string,
   badge: PropTypes.oneOf( [ 'bottomright', 'bottomleft', 'inline' ] ),
   onResolved: PropTypes.func.isRequired,
@@ -80,7 +86,9 @@ GoogleRecaptcha.propTypes = {
 GoogleRecaptcha.defaultProps = {
   locale: 'en',
   badge: 'bottomright',
-  onLoaded: () => {}
+  onLoaded: () => {},
+  sitekeyV3: null,
+  action: 'homepage',
 };
 
 export default GoogleRecaptcha;
