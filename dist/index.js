@@ -28,7 +28,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var renderers = [];
 
-var injectScript = function injectScript(locale) {
+var injectScript = function injectScript(locale, sitekeyV3) {
   window.GoogleRecaptchaLoaded = function () {
     while (renderers.length) {
       var renderer = renderers.shift();
@@ -36,9 +36,10 @@ var injectScript = function injectScript(locale) {
     }
   };
 
+  var srcRenderValue = sitekeyV3 || 'explicit';
   var script = document.createElement('script');
   script.id = 'recaptcha';
-  script.src = 'https://www.google.com/recaptcha/api.js?hl=' + locale + '&onload=GoogleRecaptchaLoaded&render=explicit';
+  script.src = 'https://www.google.com/recaptcha/api.js?hl=' + locale + '&onload=GoogleRecaptchaLoaded&render=' + srcRenderValue;
   script.type = 'text/javascript';
   script.async = true;
   script.defer = true;
@@ -67,7 +68,9 @@ var GoogleRecaptcha = function (_React$Component) {
           locale = _props.locale,
           badge = _props.badge,
           onResolved = _props.onResolved,
-          onLoaded = _props.onLoaded;
+          onLoaded = _props.onLoaded,
+          sitekeyV3 = _props.sitekeyV3,
+          action = _props.action;
 
 
       this.callbackName = 'GoogleRecaptchaResolved-' + (0, _v2.default)();
@@ -90,6 +93,13 @@ var GoogleRecaptcha = function (_React$Component) {
           _this2.getResponse = function () {
             return window.grecaptcha.getResponse(recaptchaId);
           };
+          if (sitekeyV3) {
+            _this2.executeV3 = function (cb) {
+              return window.grecaptcha.execute(sitekeyV3, { action: action }).then(function (token) {
+                return cb(token);
+              });
+            };
+          }
           onLoaded();
         }
       };
@@ -98,7 +108,7 @@ var GoogleRecaptcha = function (_React$Component) {
         loaded();
       } else {
         renderers.push(loaded);
-        injectScript(locale);
+        injectScript(locale, sitekeyV3);
       }
     }
   }, {
@@ -125,6 +135,8 @@ var GoogleRecaptcha = function (_React$Component) {
 
 GoogleRecaptcha.propTypes = {
   sitekey: _propTypes2.default.string.isRequired,
+  sitekeyV3: _propTypes2.default.string,
+  action: _propTypes2.default.string,
   locale: _propTypes2.default.string,
   badge: _propTypes2.default.oneOf(['bottomright', 'bottomleft', 'inline']),
   onResolved: _propTypes2.default.func.isRequired,
@@ -135,7 +147,9 @@ GoogleRecaptcha.propTypes = {
 GoogleRecaptcha.defaultProps = {
   locale: 'en',
   badge: 'bottomright',
-  onLoaded: function onLoaded() {}
+  onLoaded: function onLoaded() {},
+  sitekeyV3: null,
+  action: 'homepage'
 };
 
 exports.default = GoogleRecaptcha;
