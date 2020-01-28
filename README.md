@@ -79,7 +79,8 @@ import Recaptcha from 'react-google-invisible-recaptcha';
   ref={ ref => this.recaptcha = ref }
   sitekey={ <sitekey> }
   sitekeyV3={ <sitekeyV3> }
-  onResolved={ () => console.log( 'Human detected.' ) } />
+  onResolved={ () => console.log( 'Human detected.' ) }
+  action="homepage" />
 ```
 
 Then use `.executeV3` to call `grecaptcha.execute` with the v3 key.  Pass in a callback function to send the token to your backend (see [docs](https://developers.google.com/recaptcha/docs/v3#frontend_integration) for v3 front end integration).
