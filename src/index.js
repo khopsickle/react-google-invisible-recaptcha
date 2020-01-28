@@ -42,7 +42,7 @@ class GoogleRecaptcha extends React.Component {
         this.reset = () => window.grecaptcha.reset( recaptchaId );
         this.getResponse = () => window.grecaptcha.getResponse( recaptchaId );
         if (sitekeyV3) {
-          this.executeV3 = cb => window.grecaptcha.execute( sitekeyV3, { action } ).then(token => cb(token));
+          this.executeV3 = window.grecaptcha.execute( sitekeyV3, { action } );
         }
         onLoaded();
       }
